@@ -1,7 +1,7 @@
 /**
  * @file App.jsx
- * @description Enrutador principal de Nexrust Web con arquitectura modular estandarizada,
- * soporte de marcas blancas (ThemeContext), control de sesiones y ruta de superadministrador.
+ * @description Enrutador principal de Nexrust Web con arquitectura modular espejo completa
+ * y cuadrícula unificada de accesos rápidos.
  * @location /nexrust-web/src/App.jsx
  */
 
@@ -13,17 +13,24 @@ import ApiTest from './components/ApiTest';
 import SessionBar from './components/SessionBar';
 import ProtectedRoute from './components/ProtectedRoute';
 
-// Vistas importadas desde los módulos estándar
+// Vistas importadas desde los módulos estándar espejo
 import LoginView from './modules/auth/LoginView';
 import DashboardView from './modules/dashboard/DashboardView';
 import AccessPassesView from './modules/access-passes/AccessPassesView';
-import ExpensesView from './modules/expenses/ExpensesView';
-import AmenitiesView from './modules/amenities/AmenitiesView';
-import SecurityAlertsView from './modules/security-alerts/SecurityAlertsView';
+import RecurringPassesView from './modules/recurring-passes/RecurringPassesView';
+import ReservationsView from './modules/reservations/ReservationsView';
+import NotificationsView from './modules/notifications/NotificationsView';
 import InfractionsView from './modules/infractions/InfractionsView';
+import ExpensesView from './modules/expenses/ExpensesView';
+import VisitorLogsView from './modules/visitor-logs/VisitorLogsView';
+import EventsView from './modules/events/EventsView';
+import TicketsView from './modules/tickets/TicketsView';
 import SuperAdminConfigView from './modules/superadmin/SuperAdminConfigView';
 
-import { Shield, QrCode, FileText, Trophy, AlertTriangle, AlertOctagon, LogIn, Settings } from 'lucide-react';
+import { 
+  Shield, QrCode, Users, Trophy, Bell, AlertOctagon, 
+  FileText, ShieldCheck, Calendar, Wrench, Settings, LogIn 
+} from 'lucide-react';
 
 export default function App() {
   return (
@@ -31,147 +38,143 @@ export default function App() {
       <ThemeProvider>
         <BrowserRouter>
           <Routes>
-            {/* Ruta raíz: Portal de Operaciones y Accesos Rápidos (Abierta para consulta de sesión) */}
-            <Route 
-              path="/" 
+            {/* Ruta raíz: Portal de Operaciones con la Cuadrícula Completa de Módulos */}
+            <Route
+              path="/"
               element={
                 <div className="min-h-screen bg-slate-950 flex flex-col selection:bg-blue-500 selection:text-white">
                   <SessionBar />
-                  
-                  <div className="flex-1 p-8 max-w-5xl mx-auto w-full flex flex-col justify-center">
+                  <div className="flex-1 p-8 max-w-6xl mx-auto w-full flex flex-col justify-center">
                     
-                    {/* Encabezado Principal Institucional */}
-                    <div className="text-center mb-8">
-                      <span className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-2 block">
+                    {/* Encabezado Institucional */}
+                    <div className="text-center mb-6">
+                      <span className="text-xs font-semibold uppercase tracking-widest text-blue-400 mb-1 block">
                         Plataforma Hiperlocal de Gestión y Accesos
                       </span>
-                      <h1 className="text-3xl font-extrabold text-white tracking-tight">
+                      <h1 className="text-2xl font-extrabold text-white tracking-tight">
                         Portal de Operaciones
                       </h1>
-                      <p className="text-xs text-slate-400 mt-1">
+                      <p className="text-xs text-slate-400 mt-0.5">
                         Comunidad San Sebastián • Corredor Ezeiza-Canning
                       </p>
                     </div>
 
-                    {/* Estado de Conectividad del Servidor */}
-                    <div className="mb-10 max-w-xl mx-auto w-full bg-slate-900/80 backdrop-blur-md p-6 rounded-2xl border border-slate-800 shadow-xl text-center">
-                      <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
+                    {/* Estado del Sistema Backend */}
+                    <div className="mb-8 max-w-md mx-auto w-full bg-slate-900/80 backdrop-blur-md p-4 rounded-2xl border border-slate-800 shadow-xl text-center">
+                      <h3 className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
                         Estado del Sistema Backend
                       </h3>
                       <ApiTest />
                     </div>
 
-                    {/* Tarjetas de Accesos Rápidos (Grid UX Optimizada) */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <a 
-                        href="/admin/dashboard" 
-                        className="bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 hover:border-slate-700 p-5 rounded-2xl transition-all duration-200 flex flex-col items-center text-center group shadow-sm hover:shadow-md"
-                      >
-                        <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                          <Shield className="w-6 h-6" />
-                        </div>
-                        <span className="text-sm font-bold text-white">Dashboard</span>
-                        <span className="text-[11px] text-slate-400 mt-0.5">Panel general</span>
+                    {/* Cuadrícula Completa de Accesos Rápidos (Espejo Backend) */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      
+                      <a href="/admin/dashboard" className="bg-slate-900/60 hover:bg-slate-900 border border-slate-800 p-4 rounded-2xl transition flex flex-col items-center text-center group">
+                        <Shield className="w-5 h-5 text-blue-400 mb-2 group-hover:scale-110 transition" />
+                        <span className="text-xs font-bold text-white">Dashboard</span>
+                        <span className="text-[10px] text-slate-400">Panel general</span>
                       </a>
 
-                      <a 
-                        href="/admin/passes" 
-                        className="bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 hover:border-slate-700 p-5 rounded-2xl transition-all duration-200 flex flex-col items-center text-center group shadow-sm hover:shadow-md"
-                      >
-                        <div className="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                          <QrCode className="w-6 h-6" />
-                        </div>
-                        <span className="text-sm font-bold text-white">Pases QR</span>
-                        <span className="text-[11px] text-slate-400 mt-0.5">Visitas y accesos</span>
+                      <a href="/admin/access-passes" className="bg-slate-900/60 hover:bg-slate-900 border border-slate-800 p-4 rounded-2xl transition flex flex-col items-center text-center group">
+                        <QrCode className="w-5 h-5 text-emerald-400 mb-2 group-hover:scale-110 transition" />
+                        <span className="text-xs font-bold text-white">Pases QR</span>
+                        <span className="text-[10px] text-slate-400">Visitas temporales</span>
                       </a>
 
-                      <a 
-                        href="/admin/expenses" 
-                        className="bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 hover:border-slate-700 p-5 rounded-2xl transition-all duration-200 flex flex-col items-center text-center group shadow-sm hover:shadow-md"
-                      >
-                        <div className="w-12 h-12 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                          <FileText className="w-6 h-6" />
-                        </div>
-                        <span className="text-sm font-bold text-white">Expensas</span>
-                        <span className="text-[11px] text-slate-400 mt-0.5">Pagos y comprobantes</span>
+                      <a href="/admin/recurring-passes" className="bg-slate-900/60 hover:bg-slate-900 border border-slate-800 p-4 rounded-2xl transition flex flex-col items-center text-center group">
+                        <Users className="w-5 h-5 text-teal-400 mb-2 group-hover:scale-110 transition" />
+                        <span className="text-xs font-bold text-white">Personal Habitual</span>
+                        <span className="text-[10px] text-slate-400">Pases recurrentes</span>
                       </a>
 
-                      <a 
-                        href="/admin/amenities" 
-                        className="bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 hover:border-slate-700 p-5 rounded-2xl transition-all duration-200 flex flex-col items-center text-center group shadow-sm hover:shadow-md"
-                      >
-                        <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                          <Trophy className="w-6 h-6" />
-                        </div>
-                        <span className="text-sm font-bold text-white">Amenities</span>
-                        <span className="text-[11px] text-slate-400 mt-0.5">Turnos de canchas</span>
+                      <a href="/admin/reservations" className="bg-slate-900/60 hover:bg-slate-900 border border-slate-800 p-4 rounded-2xl transition flex flex-col items-center text-center group">
+                        <Trophy className="w-5 h-5 text-amber-400 mb-2 group-hover:scale-110 transition" />
+                        <span className="text-xs font-bold text-white">Amenities</span>
+                        <span className="text-[10px] text-slate-400">Canchas y SUM</span>
                       </a>
 
-                      <a 
-                        href="/admin/security-alerts" 
-                        className="bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 hover:border-slate-700 p-5 rounded-2xl transition-all duration-200 flex flex-col items-center text-center group shadow-sm hover:shadow-md"
-                      >
-                        <div className="w-12 h-12 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                          <AlertTriangle className="w-6 h-6" />
-                        </div>
-                        <span className="text-sm font-bold text-white">Alertas</span>
-                        <span className="text-[11px] text-slate-400 mt-0.5">Botón de pánico</span>
+                      <a href="/admin/notifications" className="bg-slate-900/60 hover:bg-slate-900 border border-slate-800 p-4 rounded-2xl transition flex flex-col items-center text-center group">
+                        <Bell className="w-5 h-5 text-yellow-400 mb-2 group-hover:scale-110 transition" />
+                        <span className="text-xs font-bold text-white">Notificaciones</span>
+                        <span className="text-[10px] text-slate-400">Avisos y alarmas</span>
                       </a>
 
-                      <a 
-                        href="/admin/infractions" 
-                        className="bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 hover:border-slate-700 p-5 rounded-2xl transition-all duration-200 flex flex-col items-center text-center group shadow-sm hover:shadow-md"
-                      >
-                        <div className="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                          <AlertOctagon className="w-6 h-6" />
-                        </div>
-                        <span className="text-sm font-bold text-white">Infracciones</span>
-                        <span className="text-[11px] text-slate-400 mt-0.5">Multas y apelaciones</span>
+                      <a href="/admin/infractions" className="bg-slate-900/60 hover:bg-slate-900 border border-slate-800 p-4 rounded-2xl transition flex flex-col items-center text-center group">
+                        <AlertOctagon className="w-5 h-5 text-rose-400 mb-2 group-hover:scale-110 transition" />
+                        <span className="text-xs font-bold text-white">Infracciones</span>
+                        <span className="text-[10px] text-slate-400">Multas y actas</span>
                       </a>
 
-                      <a 
-                        href="/admin/superadmin/config" 
-                        className="bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 hover:border-slate-700 p-5 rounded-2xl transition-all duration-200 flex flex-col items-center text-center group shadow-sm hover:shadow-md"
-                      >
-                        <div className="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                          <Settings className="w-6 h-6" />
-                        </div>
-                        <span className="text-sm font-bold text-white">Superadmin</span>
-                        <span className="text-[11px] text-slate-400 mt-0.5">Configuración White-Label</span>
+                      <a href="/admin/expenses" className="bg-slate-900/60 hover:bg-slate-900 border border-slate-800 p-4 rounded-2xl transition flex flex-col items-center text-center group">
+                        <FileText className="w-5 h-5 text-indigo-400 mb-2 group-hover:scale-110 transition" />
+                        <span className="text-xs font-bold text-white">Expensas</span>
+                        <span className="text-[10px] text-slate-400">Pagos y cuentas</span>
                       </a>
 
-                      <a 
-                        href="/auth/login" 
-                        className="bg-blue-600/10 hover:bg-blue-600/20 border border-blue-500/30 hover:border-blue-500/50 p-5 rounded-2xl transition-all duration-200 flex flex-col items-center text-center group col-span-1 shadow-sm hover:shadow-md"
-                      >
-                        <div className="w-12 h-12 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                          <LogIn className="w-6 h-6" />
-                        </div>
-                        <span className="text-sm font-bold text-white">Login</span>
-                        <span className="text-[11px] text-blue-300 mt-0.5">Credenciales</span>
+                      <a href="/admin/visitor-logs" className="bg-slate-900/60 hover:bg-slate-900 border border-slate-800 p-4 rounded-2xl transition flex flex-col items-center text-center group">
+                        <ShieldCheck className="w-5 h-5 text-cyan-400 mb-2 group-hover:scale-110 transition" />
+                        <span className="text-xs font-bold text-white">Control Garita</span>
+                        <span className="text-[10px] text-slate-400">Ingresos y egresos</span>
                       </a>
+
+                      <a href="/admin/events" className="bg-slate-900/60 hover:bg-slate-900 border border-slate-800 p-4 rounded-2xl transition flex flex-col items-center text-center group">
+                        <Calendar className="w-5 h-5 text-purple-400 mb-2 group-hover:scale-110 transition" />
+                        <span className="text-xs font-bold text-white">Eventos</span>
+                        <span className="text-[10px] text-slate-400">Listas de invitados</span>
+                      </a>
+
+                      <a href="/admin/tickets" className="bg-slate-900/60 hover:bg-slate-900 border border-slate-800 p-4 rounded-2xl transition flex flex-col items-center text-center group">
+                        <Wrench className="w-5 h-5 text-orange-400 mb-2 group-hover:scale-110 transition" />
+                        <span className="text-xs font-bold text-white">Ticketera</span>
+                        <span className="text-[10px] text-slate-400">Reclamos y obras</span>
+                      </a>
+
+                      <a href="/admin/superadmin/config" className="bg-slate-900/60 hover:bg-slate-900 border border-slate-800 p-4 rounded-2xl transition flex flex-col items-center text-center group">
+                        <Settings className="w-5 h-5 text-fuchsia-400 mb-2 group-hover:scale-110 transition" />
+                        <span className="text-xs font-bold text-white">Superadmin</span>
+                        <span className="text-[10px] text-slate-400">Marca blanca</span>
+                      </a>
+
+                      <a href="/auth/login" className="bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/40 p-4 rounded-2xl transition flex flex-col items-center text-center group">
+                        <LogIn className="w-5 h-5 text-blue-400 mb-2 group-hover:scale-110 transition" />
+                        <span className="text-xs font-bold text-white">Iniciar Sesión</span>
+                        <span className="text-[10px] text-blue-300">Acceso seguro</span>
+                      </a>
+
                     </div>
 
                   </div>
                 </div>
+              }
+            />
+
+            {/* Rutas Públicas */}
+            <Route path="/auth/login" element={<LoginView />} />
+
+            {/* Rutas Operativas Protegidas (Espejo Modular) */}
+            <Route path="/admin/dashboard" element={<ProtectedRoute><DashboardView /></ProtectedRoute>} />
+            <Route path="/admin/access-passes" element={<ProtectedRoute><AccessPassesView /></ProtectedRoute>} />
+            <Route path="/admin/recurring-passes" element={<ProtectedRoute><RecurringPassesView /></ProtectedRoute>} />
+            <Route path="/admin/reservations" element={<ProtectedRoute><ReservationsView /></ProtectedRoute>} />
+            <Route path="/admin/notifications" element={<ProtectedRoute><NotificationsView /></ProtectedRoute>} />
+            <Route path="/admin/infractions" element={<ProtectedRoute><InfractionsView /></ProtectedRoute>} />
+            <Route path="/admin/expenses" element={<ProtectedRoute><ExpensesView /></ProtectedRoute>} />
+            <Route path="/admin/visitor-logs" element={<ProtectedRoute><VisitorLogsView /></ProtectedRoute>} />
+            <Route path="/admin/events" element={<ProtectedRoute><EventsView /></ProtectedRoute>} />
+            <Route path="/admin/tickets" element={<ProtectedRoute><TicketsView /></ProtectedRoute>} />
+
+            {/* Panel de Superadmin (Restringido por rol) */}
+            <Route 
+              path="/admin/superadmin/config" 
+              element={
+                <ProtectedRoute requiredRole="superadmin">
+                  <SuperAdminConfigView />
+                </ProtectedRoute>
               } 
             />
 
-            {/* Módulo de Autenticación */}
-            <Route path="/auth/login" element={<LoginView />} />
-
-            {/* Módulos Operativos Protegidos */}
-            <Route path="/admin/dashboard" element={<ProtectedRoute><DashboardView /></ProtectedRoute>} />
-            <Route path="/admin/passes" element={<ProtectedRoute><AccessPassesView /></ProtectedRoute>} />
-            <Route path="/admin/expenses" element={<ProtectedRoute><ExpensesView /></ProtectedRoute>} />
-            <Route path="/admin/amenities" element={<ProtectedRoute><AmenitiesView /></ProtectedRoute>} />
-            <Route path="/admin/security-alerts" element={<ProtectedRoute><SecurityAlertsView /></ProtectedRoute>} />
-            <Route path="/admin/infractions" element={<ProtectedRoute><InfractionsView /></ProtectedRoute>} />
-            
-            {/* Panel de Configuración del Superusuario */}
-            <Route path="/admin/superadmin/config" element={<ProtectedRoute><SuperAdminConfigView /></ProtectedRoute>} />
-
-            {/* Redirección por defecto ante rutas inexistentes */}
+            {/* Redirección por defecto */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>

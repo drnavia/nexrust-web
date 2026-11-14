@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { fetchAmenities, fetchReservations, createReservation } from './amenity.service';
+import { fetchAmenities, fetchReservations, createReservation } from './reservations.service';
 import { Calendar, Clock, Plus, CheckCircle2, AlertCircle, Loader2, Trophy } from 'lucide-react';
 
 export default function AmenitiesView() {

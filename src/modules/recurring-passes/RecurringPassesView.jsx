@@ -6,7 +6,7 @@
 
 import React, { useState, useEffect } from 'react';
 import SessionBar from '../../components/SessionBar';
-import { recurringService } from './recurring.service';
+import { recurringService } from './recurringPasses.service';
 import { Users, Plus, Calendar, Clock, Trash2, ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function RecurringPassesView() {

@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { fetchSecurityAlerts, createSecurityAlert } from './securityAlert.service';
+import { fetchSecurityAlerts, createSecurityAlert } from './notifications.service';
 import { AlertTriangle, ShieldAlert, Flame, Stethoscope, BellRing, CheckCircle2, Loader2, Radio } from 'lucide-react';
 
 export default function SecurityAlertsView() {
