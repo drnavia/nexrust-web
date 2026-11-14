@@ -1,6 +1,6 @@
 /**
  * @file SuperAdminConfigView.jsx
- * @description Panel exclusivo para superusuarios para configurar la marca blanca del country con selector global.
+ * @description Panel exclusivo para superusuarios para administrar la marca blanca y colores institucionales.
  * @location /nexrust-web/src/modules/superadmin/SuperAdminConfigView.jsx
  */
 
@@ -12,10 +12,8 @@ import { Settings, Palette, Building, Save, CheckCircle2, AlertCircle, ArrowLeft
 
 export default function SuperAdminConfigView() {
   const { user } = useAuth();
-  const [countries, setCountries] = useState([]);
-  const [selectedCountryId, setSelectedCountryId] = useState('');
   
-  const [brandName, setBrandName] = useState('');
+  const [brandName, setBrandName] = useState('San Sebastián');
   const [primaryColor, setPrimaryColor] = useState('#2563eb');
   const [accentColor, setAccentColor] = useState('#1d4ed8');
   const [logoUrl, setLogoUrl] = useState('');
@@ -23,64 +21,37 @@ export default function SuperAdminConfigView() {
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState({ type: '', message: '' });
 
-  // Cargar la lista de countries al iniciar la vista
   useEffect(() => {
-    loadCountries();
-  }, []);
-
-  const loadCountries = async () => {
-    try {
-      setLoading(true);
-      const data = await superAdminService.getCountries();
-      setCountries(data);
-      
-      // Si hay countries disponibles, seleccionamos el primero o el del usuario por defecto
-      if (data && data.length > 0) {
-        const initialId = user?.country_id || data[0].id;
-        setSelectedCountryId(initialId);
-        loadConfig(initialId);
-      }
-    } catch (err) {
-      console.error('Error al cargar countries:', err);
-      setFeedback({ type: 'error', message: 'No se pudo cargar la lista de countries desde el servidor.' });
-    } finally {
-      setLoading(false);
+    if (user && user.country_id) {
+      loadCountryConfig(user.country_id);
     }
-  };
+  }, [user]);
 
-  const loadConfig = async (countryId) => {
-    if (!countryId) return;
+  /**
+   * Carga la configuración remota del country desde la base de datos.
+   */
+  const loadCountryConfig = async (countryId) => {
     try {
       setLoading(true);
       const data = await superAdminService.getCountryConfig(countryId);
       if (data && data.theme_config) {
-        setBrandName(data.theme_config.brandName || data.name || '');
+        setBrandName(data.theme_config.brandName || 'San Sebastián');
         setPrimaryColor(data.theme_config.primaryColor || '#2563eb');
         setAccentColor(data.theme_config.accentColor || '#1d4ed8');
         setLogoUrl(data.theme_config.logoUrl || '');
-      } else if (data) {
-        setBrandName(data.name || '');
       }
     } catch (err) {
-      console.warn('No se pudo cargar la configuración para el country seleccionado.', err);
+      console.warn('No se pudo cargar la configuración remota, usando valores por defecto.', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCountryChange = (e) => {
-    const newId = e.target.value;
-    setSelectedCountryId(newId);
-    loadConfig(newId);
-  };
-
+  /**
+   * Maneja el envío del formulario para guardar los cambios de marca blanca.
+   */
   const handleSave = async (e) => {
     e.preventDefault();
-    if (!selectedCountryId) {
-      setFeedback({ type: 'error', message: 'Debe seleccionar un Country válido para guardar.' });
-      return;
-    }
-
     setLoading(true);
     setFeedback({ type: '', message: '' });
 
@@ -92,24 +63,27 @@ export default function SuperAdminConfigView() {
     };
 
     try {
-      await superAdminService.updateCountryConfig(selectedCountryId, themeConfig);
-      
+      if (user && user.country_id) {
+        await superAdminService.updateCountryConfig(user.country_id, themeConfig);
+      }
+
+      // Aplicación inmediata de variables CSS globales en el DOM
       const root = document.documentElement;
       root.style.setProperty('--nexrust-primary', primaryColor);
       root.style.setProperty('--nexrust-accent', accentColor);
 
-      setFeedback({ type: 'success', message: '¡Configuración de marca blanca guardada y aplicada con éxito en la base de datos!' });
+      setFeedback({ type: 'success', message: '¡Configuración de marca blanca guardada y aplicada con éxito!' });
     } catch (err) {
-      const errorMsg = err.response?.data?.message || err.message || 'Error desconocido al guardar';
-      setFeedback({ type: 'error', message: `Error al guardar: ${errorMsg}` });
+      setFeedback({ type: 'error', message: 'Error al guardar la configuración en el servidor.' });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-blue-500 selection:text-white">
       <SessionBar />
+      
       <div className="flex-1 p-8 max-w-4xl mx-auto w-full">
         <div className="mb-6 flex items-center justify-between">
           <a href="/admin/dashboard" className="flex items-center space-x-2 text-xs font-semibold text-slate-400 hover:text-white transition">
@@ -117,37 +91,18 @@ export default function SuperAdminConfigView() {
             <span>Volver al Dashboard</span>
           </a>
           <span className="bg-purple-500/10 text-purple-400 border border-purple-500/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-            Modo Superusuario (Superadmin)
+            Modo Superusuario
           </span>
         </div>
 
         <div className="mb-8">
           <h1 className="text-2xl font-extrabold tracking-tight flex items-center space-x-3">
             <Settings className="w-7 h-7 text-blue-400" />
-            <span>Gestión Global de Identidad y Marca Blanca</span>
+            <span>Gestión de Identidad y Marca Blanca</span>
           </h1>
           <p className="text-xs text-slate-400 mt-1">
-            Configure los parámetros visuales institucionales para cualquier barrio de la red sin tocar código fuente.
+            Personaliza los parámetros visuales institucionales para este barrio sin tocar código fuente.
           </p>
-        </div>
-
-        {/* Selector Global de Country para el Superadmin */}
-        <div className="mb-6 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-lg">
-          <div className="flex items-center space-x-3">
-            <Building className="w-5 h-5 text-blue-400" />
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-300">Seleccionar Country / Barrio:</span>
-          </div>
-          <select 
-            value={selectedCountryId}
-            onChange={handleCountryChange}
-            className="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-blue-500 transition"
-          >
-            {countries.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name} ({c.zone || 'Sin zona'})
-              </option>
-            ))}
-          </select>
         </div>
 
         {feedback.message && (
@@ -161,34 +116,34 @@ export default function SuperAdminConfigView() {
           </div>
         )}
 
-        <form onSubmit={handleSave} className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+        <form onSubmit={handleSave} className="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-6">
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                Nombre de la Comunidad / Barrio
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2 flex items-center space-x-2">
+                <Building className="w-4 h-4 text-blue-400" />
+                <span>Nombre del Barrio / Comunidad</span>
               </label>
-              <div className="relative">
-                <Building className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
-                <input 
-                  type="text"
-                  value={brandName}
-                  onChange={(e) => setBrandName(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-10 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 transition"
-                  required
-                />
-              </div>
+              <input 
+                type="text" 
+                value={brandName} 
+                onChange={(e) => setBrandName(e.target.value)}
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 transition"
+                required
+              />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                URL del Logotipo Institucional
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2 flex items-center space-x-2">
+                <Palette className="w-4 h-4 text-emerald-400" />
+                <span>URL del Logotipo Institucional</span>
               </label>
               <input 
-                type="text"
-                value={logoUrl}
+                type="text" 
+                value={logoUrl} 
                 onChange={(e) => setLogoUrl(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 transition"
                 placeholder="https://ejemplo.com/logo.png"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 transition"
               />
             </div>
           </div>
@@ -201,14 +156,14 @@ export default function SuperAdminConfigView() {
               </label>
               <div className="flex items-center space-x-3">
                 <input 
-                  type="color"
-                  value={primaryColor}
+                  type="color" 
+                  value={primaryColor} 
                   onChange={(e) => setPrimaryColor(e.target.value)}
                   className="w-12 h-10 rounded-lg bg-slate-950 border border-slate-800 cursor-pointer"
                 />
                 <input 
-                  type="text"
-                  value={primaryColor}
+                  type="text" 
+                  value={primaryColor} 
                   onChange={(e) => setPrimaryColor(e.target.value)}
                   className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white uppercase font-mono focus:outline-none focus:border-blue-500 transition"
                 />
@@ -222,14 +177,14 @@ export default function SuperAdminConfigView() {
               </label>
               <div className="flex items-center space-x-3">
                 <input 
-                  type="color"
-                  value={accentColor}
+                  type="color" 
+                  value={accentColor} 
                   onChange={(e) => setAccentColor(e.target.value)}
                   className="w-12 h-10 rounded-lg bg-slate-950 border border-slate-800 cursor-pointer"
                 />
                 <input 
-                  type="text"
-                  value={accentColor}
+                  type="text" 
+                  value={accentColor} 
                   onChange={(e) => setAccentColor(e.target.value)}
                   className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white uppercase font-mono focus:outline-none focus:border-blue-500 transition"
                 />
@@ -237,17 +192,43 @@ export default function SuperAdminConfigView() {
             </div>
           </div>
 
-          <div className="flex justify-end pt-4">
+          <div className="pt-4 border-t border-slate-800">
+            <span className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
+              Vista Previa de Componentes Institucionales
+            </span>
+            <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
+              <div>
+                <h4 className="text-sm font-bold text-white">{brandName}</h4>
+                <p className="text-[10px] text-slate-400">Plataforma Hiperlocal Nexrust</p>
+              </div>
+              <div className="flex space-x-3">
+                <div 
+                  className="px-4 py-2 rounded-lg text-xs font-bold text-white shadow-sm"
+                  style={{ backgroundColor: primaryColor }}
+                >
+                  Primario
+                </div>
+                <div 
+                  className="px-4 py-2 rounded-lg text-xs font-bold text-white shadow-sm"
+                  style={{ backgroundColor: accentColor }}
+                >
+                  Acento
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-4 flex justify-end">
             <button
               type="submit"
-              disabled={loading || !selectedCountryId}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center space-x-2 shadow-lg disabled:opacity-50"
-              style={{ backgroundColor: primaryColor }}
+              disabled={loading}
+              className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-wider transition flex items-center space-x-2 shadow-lg disabled:opacity-50"
             >
               <Save className="w-4 h-4" />
-              <span>{loading ? 'Guardando...' : 'Guardar Cambios de Marca'}</span>
+              <span>{loading ? 'Guardando...' : 'Guardar Configuración'}</span>
             </button>
           </div>
+
         </form>
       </div>
     </div>
